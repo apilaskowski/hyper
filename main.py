@@ -16,6 +16,14 @@ def signal_handler(signal, frame):
     interrupted = True
 
 
+def is_int(v):
+    try:
+        int(v)
+        return True
+    except ValueError:
+        return False
+
+
 class Hyper:
     def __init__(self):
         self.llh_types = [(0, 'Creation'), (1, 'Perturbation')]
@@ -46,7 +54,13 @@ class Hyper:
 
     def use_heuristic(self, heuristic_id, heuristic_type=1, address=0):
         print('USE ' + str(heuristic_type) + ' ' + str(heuristic_id) + ' ' + str(address))
-        score = float(input())
+        data = input()
+        if not is_int(data):
+            self.sum_of_improvements -= self.heuristic_reliability[heuristic_type][heuristic_id]
+            self.heuristic_reliability[heuristic_type][heuristic_id] = 0
+            return
+
+        score = float(data)
 
         if float(score) > self.best_score:
             self.best_score = float(score)
