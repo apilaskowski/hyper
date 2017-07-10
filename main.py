@@ -1,8 +1,79 @@
 #!/usr/bin/env python3
 
-# TODO prepare few types of request to executioner
-# ask about number of heuristics(LLH)
-# ask data with evaluation
-# send data to single LLH, wait for respond
-# gather statistics about LLHs
-# when time passed, send result somewhere (??)
+from logger import get_logger
+from random import random
+import signal
+import numpy as np
+
+logger = get_logger()
+log = logger.info
+
+interrupted = False
+
+
+def signal_handler(signal, frame):
+    log('Need to stop')
+    global interrupted
+    interrupted = True
+
+
+class Hyper:
+    def __init__(self):
+        self.llh_types = [(0, 'Creation'), (1, 'Perturbation')]
+
+        self.sum_of_improvements = 0
+
+        self.creating_number = 0
+        self.perturbation_number = 0
+        self.ask_heuristics_number(0)
+        self.ask_heuristics_number(1)
+
+        self.best_score = .0
+        self.heuristic_reliability = []
+        self.init_reliability_table()
+
+    def init_reliability_table(self):
+        self.heuristic_reliability = [[1 for _ in range(self.creating_number)], [1 for _ in range(self.perturbation_number)]]
+
+    def ask_heuristics_number(self, heuristic_type=0):
+        print('GET ' + str(self.llh_types[heuristic_type][0]))
+        number = int(input())
+
+        if heuristic_type == 0:
+            self.creating_number = number
+        else:
+            self.perturbation_number = number
+            self.sum_of_improvements = number
+
+    def use_heuristic(self, heuristic_id, heuristic_type=1, address=0):
+        print('USE ' + str(heuristic_type) + ' ' + str(heuristic_id) + ' ' + str(address))
+        score = float(input())
+
+        if float(score) > self.best_score:
+            self.best_score = float(score)
+            self.sum_of_improvements += 1
+            self.heuristic_reliability[heuristic_type][heuristic_id] += 1
+
+    def choose_heuristic(self, heuristic_type=1):
+        choice = float(self.sum_of_improvements) * random()
+        log(self.sum_of_improvements)
+        log(choice)
+        index = 0
+        while choice - self.heuristic_reliability[heuristic_type][index] > 0:
+            choice -= self.heuristic_reliability[heuristic_type][index]
+            index += 1
+        return index
+
+
+if __name__ == '__main__':
+    signal.signal(signal.SIGTERM, signal_handler)
+
+    hyper = Hyper()
+
+    while not interrupted:
+        h_id = hyper.choose_heuristic()
+        hyper.use_heuristic(h_id)
+
+    print(hyper.heuristic_reliability)
+
+    print(str(hyper.best_score))
