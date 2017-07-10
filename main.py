@@ -3,7 +3,6 @@
 from logger import get_logger
 from random import random
 import signal
-import numpy as np
 
 logger = get_logger()
 log = logger.info
