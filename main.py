@@ -56,8 +56,6 @@ class Hyper:
 
     def choose_heuristic(self, heuristic_type=1):
         choice = float(self.sum_of_improvements) * random()
-        log(self.sum_of_improvements)
-        log(choice)
         index = 0
         while choice - self.heuristic_reliability[heuristic_type][index] > 0:
             choice -= self.heuristic_reliability[heuristic_type][index]
