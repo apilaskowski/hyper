@@ -11,7 +11,6 @@ interrupted = False
 
 
 def signal_handler(signal, frame):
-    log('Need to stop')
     global interrupted
     interrupted = True
 
