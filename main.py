@@ -16,9 +16,9 @@ def signal_handler(signal, frame):
     interrupted = True
 
 
-def is_int(v):
+def is_float(v):
     try:
-        int(v)
+        float(v)
         return True
     except ValueError:
         return False
@@ -28,7 +28,7 @@ class Hyper:
     def __init__(self):
         self.llh_types = [(0, 'Creation'), (1, 'Perturbation')]
 
-        self.sum_of_improvements = 0
+        self.sum_of_improvements = [0, 0]
 
         self.creating_number = 0
         self.perturbation_number = 0
@@ -36,8 +36,11 @@ class Hyper:
         self.ask_heuristics_number(1)
 
         self.best_score = .0
+
         self.heuristic_reliability = []
         self.init_reliability_table()
+
+        self.use_heuristic(0, 0)
 
     def init_reliability_table(self):
         self.heuristic_reliability = [[1 for _ in range(self.creating_number)], [1 for _ in range(self.perturbation_number)]]
@@ -50,13 +53,13 @@ class Hyper:
             self.creating_number = number
         else:
             self.perturbation_number = number
-            self.sum_of_improvements = number
+            self.sum_of_improvements[heuristic_type] = number
 
     def use_heuristic(self, heuristic_id, heuristic_type=1, address=0):
         print('USE ' + str(heuristic_type) + ' ' + str(heuristic_id) + ' ' + str(address))
         data = input()
-        if not is_int(data):
-            self.sum_of_improvements -= self.heuristic_reliability[heuristic_type][heuristic_id]
+        if not is_float(data):
+            self.sum_of_improvements[heuristic_type] -= self.heuristic_reliability[heuristic_type][heuristic_id]
             self.heuristic_reliability[heuristic_type][heuristic_id] = 0
             return
 
@@ -64,16 +67,20 @@ class Hyper:
 
         if float(score) > self.best_score:
             self.best_score = float(score)
-            self.sum_of_improvements += 1
+            self.sum_of_improvements[heuristic_type] += 1
             self.heuristic_reliability[heuristic_type][heuristic_id] += 1
 
     def choose_heuristic(self, heuristic_type=1):
-        choice = float(self.sum_of_improvements) * random()
+        choice = float(self.sum_of_improvements[heuristic_type]) * random()
         index = 0
         while choice - self.heuristic_reliability[heuristic_type][index] > 0:
             choice -= self.heuristic_reliability[heuristic_type][index]
             index += 1
         return index
+
+    @staticmethod
+    def declare_solution(): # should be sth smarter
+        print('FINAL ' + str(0))
 
 
 if __name__ == '__main__':
@@ -85,6 +92,4 @@ if __name__ == '__main__':
         h_id = hyper.choose_heuristic()
         hyper.use_heuristic(h_id)
 
-    print(hyper.heuristic_reliability)
-
-    print(str(hyper.best_score))
+    hyper.declare_solution()
