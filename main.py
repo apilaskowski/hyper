@@ -60,6 +60,7 @@ class Hyper:
         else:
             print('USE ' + str(heuristic_type) + ' ' + str(heuristic_id))
         data, status = input().split()
+
         if is_float(status) and int(status) is not 0:
             self.sum_of_improvements[heuristic_type] -= self.heuristic_reliability[heuristic_type][heuristic_id]
             self.heuristic_reliability[heuristic_type][heuristic_id] = 0
