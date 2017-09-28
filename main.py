@@ -82,7 +82,7 @@ class Hyper:
         return index
 
     @staticmethod
-    def declare_solution(): # should be sth smarter
+    def declare_solution(): # should be something smarter
         print('FINAL')
 
 
